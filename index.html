@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./lib/bootstrap/dist/css/bootstrap.css">
+    <title>Document</title>
+</head>
+<style>
+    form .error {
+    color: #ff0000;
+}
+</style>
+<body>
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Emergency Coding System</a>
+        </nav>
+    </div>
+    
+    <main>
+        <div>
+            <h3 class="text-center"> Call 911 For Emergency</h3>
+        </div>
+        <div class="container" id="buttonsBox">
+            
+        </div>
+        
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="submit-activation">
+                            <div class="form-group">
+                                <label for="badge-number" class="col-form-label">Badge Number:</label>
+                                <input type="number" required class="form-control" id="badge-number">
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="col-form-label">Location</label>
+                                <select class="form-control" id="select-location">
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Activate</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script src="./lib/jquery.js"></script>
+<script src="./lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="./lib/jquery.validate.js"></script>
+<script>
+    const api = 'http://localhost:36879';
+    const contentType = 'application/json';
+    const dataType = "json";
+
+    $(document).ready(function () {
+        $("#submit-activation").validate();
+        $.ajax({
+            type: 'GET',
+            url: api + '/api/code',
+            contentType: contentType,
+            dataType: dataType,
+            success: function(result){
+                console.log(result);
+                result.forEach(element => {
+                    $("#buttonsBox").append(
+                    '<button id="'+ element.id+'" class="btn" style="background-color:'+ element.htmlColor+'; color:'+element.htmlTextColor+'; padding: 15px 32px; margin: 10px;" data-codeid="'+ element.id +'" data-code="'+element.name+'" data-toggle="modal" data-target="#exampleModal">' + element.name  +'</button>');
+                });
+            }
+        });
+
+
+
+        $.ajax({
+            type: 'GET',
+            url: api + '/api/location',
+            contentType: contentType,
+            dataType: dataType,
+            success: function (result){
+                console.log(result);
+                result.forEach(element => {
+                    $("#select-location").append(
+                        '<option value='+ element.id +'>'+ element.name +'</option>'
+                    );
+                })
+            }
+        });
+
+
+
+        let activation = {
+            codeId: '',
+            locationId: '',
+            activatedBy: ''
+        };
+
+
+        $('#exampleModal').on('hide.bs.modal', function (event) {
+            activation = null;
+            var form = $("#submit-activation")[0].reset();
+            console.log(activation);
+        });
+
+        var codeId = 0;
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var codeName = button.data('code');
+            codeId = button.data('codeid');
+            var modal = $(this);
+            modal.find('.modal-title').text('Are You Sure You Want To Activate ' + codeName)
+            
+        });
+        
+        $("#submit-activation").submit(function (e) {
+            var form = $(this);
+
+            e.preventDefault();
+            
+            var locationId = $("#select-location").val();
+            var activatedBy = $("#badge-number").val();
+
+
+            activation = {
+                codeId: codeId,
+                locationId: parseInt(locationId),
+                activatedBy: parseInt(activatedBy)
+            };
+
+            console.log(activation);
+            var data = JSON.stringify(activation);
+
+            $.ajax({
+                type: 'POST',
+                url: api + '/api/activation',
+                contentType: contentType,
+                dataType: dataType,
+                data: data,
+                success: function (result){
+                    console.log(result);
+                },
+                error: function (data){
+                    console.log(jQuery.parseJSON(data.responseText));
+                }
+            });
+
+
+            form[0].reset();
+        });
+
+
+
+    });
+
+    
+        
+
+
+</script>
+</html>

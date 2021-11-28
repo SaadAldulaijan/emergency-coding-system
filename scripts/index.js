@@ -16,13 +16,15 @@ const api = 'http://localhost:36879';
                     // '<button id="'+ element.id+'" class="btn" style="background-color:'+ element.htmlColor+'; color:'+element.htmlTextColor+'; padding: 15px 32px; margin: 10px;" data-codeid="'+ element.id +'" data-code="'+element.name+'" data-toggle="modal" data-target="#exampleModal">' + element.name  +'</button>');
                     $("#buttonsBox").append(
                         `
-                        <div class="card" style="width: 16rem;">
-                        <img class="card-img-top" src="./img/code-red-icon.png" alt="Card image cap">
+                        <div class="col">
+                        <div class="card" style="width: 18rem; height: 27rem;">
+                        <img class="card-img-top" height="200" width="40" src="./img/${element.name}.png" alt="Card image cap">
                         <div class="card-body">
                           <h5 class="card-title">${element.name}</h5>
                           <p class="card-text">${element.description}</p>
                           <button id="${element.id}" class="btn" style="background-color:${element.htmlColor}; color:${element.htmlTextColor}; padding: 15px 32px; margin: 10px;" data-codeid="${element.id}" data-code="${element.name}" data-toggle="modal" data-target="#exampleModal">${element.name}</button>
                         </div>
+                      </div>
                       </div>
                         `
                     );

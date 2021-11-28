@@ -29,6 +29,17 @@ const api = 'http://localhost:36879';
                         `
                     );
                 });
+            },
+            error: function(err){
+                if (err.statusText === "error"){
+                    $("#buttonsBox").append(
+                        `
+                        <div class="alert alert-danger" role="alert">
+                            Could not fetch data!
+                        </div>
+                        `
+                    );
+                }
             }
         });
 
